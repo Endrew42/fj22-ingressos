@@ -14,8 +14,10 @@ import org.springframework.web.servlet.ModelAndView;
 import br.com.caelum.ingresso.dao.FilmeDao;
 import br.com.caelum.ingresso.dao.SalaDao;
 import br.com.caelum.ingresso.dao.SessaoDao;
+import br.com.caelum.ingresso.model.Sala;
 import br.com.caelum.ingresso.model.Sessao;
 import br.com.caelum.ingresso.model.form.SessaoForm;
+import br.com.caelum.ingresso.validacao.GerenciadorDeSessao;
 
 @Controller
 public class SessaoController {
@@ -52,6 +54,11 @@ public class SessaoController {
 		Sessao sessao = form.toSessao(salaDao, filmeDao);
 		
 		sessaoDao.save(sessao);
+		Sala sala = salaDao.findOne(form.getSalaId());
+		GerenciadorDeSessao gerenciadorDeSessao = new GerenciadorDeSessao(sessaoDao.buscaSessoesDaSala(sala));
+				if(gerenciadorDeSessao.cabe(sessao)){
+					sessaoDao.save(sessao);
+				}
 		
 		return modelAndView;
 	}
